@@ -3,7 +3,7 @@
  * DESC:
  * {%widget name="demo:a.tpl" inline%}
  *  =>
- * {%widget_inline%}<!--[inline /a.tpl]-->{%/widget_inline%}
+ * {%widget_inline%}<!--inline [/a.tpl]-->{%/widget_inline%}
  */
 
 
