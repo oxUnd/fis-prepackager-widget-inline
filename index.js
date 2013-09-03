@@ -29,7 +29,7 @@ function _replace(id, properties) {
 }
 
 function replaceWidget(content) {
-    var inline_re = /\binline\b/i
+    var inline_re = /\s+inline(?:\s+|$)/i
         , escape_ld = pregQuote(ld)
         , escape_rd = pregQuote(rd)
         , widget_re = new RegExp(escape_ld + 'widget(?:((?=\\s)[\\s\\S]*?["\'\\s\\w])'+escape_rd+'|'+escape_rd+')', 'ig');
