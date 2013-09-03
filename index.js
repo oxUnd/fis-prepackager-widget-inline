@@ -19,12 +19,13 @@ function pregQuote (str, delimiter) {
 function _replace(id, properties) {
     id = id || '';
     properties = properties || '';
-    var p;
+    var p, path;
     if ((p = id.indexOf(':')) !== -1) {
-        id = '/' + id.substr(p + 1);
+        path = '/' + id.substr(p + 1);
     }
     return ld + 'widget_inline ' + properties + rd          /*start*/
-            + '<!--inline[' + id + ']-->'                   /*内嵌语句*/
+            + '<!--inline[' + path + ']-->'                   /*内嵌语句*/
+            + ld + 'require name="' + id + '"' + rd
             + ld + '/widget_inline' + rd;                   /*end*/
 }
 
