@@ -30,3 +30,7 @@ fis.config.merge({
 {%widget name="demo:widget/widget_inline.tpl" inline%}
 ```
 + 调用widget时，如果name的属性值被配置的include正则命中，则widget内嵌。
+
+###说明
+
++ smarty插件是用来提供一个局部作用域
