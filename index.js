@@ -24,7 +24,7 @@ function _replace(id, properties) {
         id = '/' + id.substr(p + 1);
     }
     return ld + 'widget_inline ' + properties + rd          /*start*/
-            + '<!--inline[' + id + ']-->'  /*内嵌语句*/
+            + '<!--inline[' + id + ']-->'                   /*内嵌语句*/
             + ld + '/widget_inline' + rd;                   /*end*/
 }
 
@@ -58,7 +58,7 @@ module.exports = function(content, file, conf) {
 
     ld = conf.left_delimiter || fis.config.get('settings.smarty.left_delimiter') || '{%';
     rd = conf.right_delimiter || fis.config.get('settings.smarty.right_delimiter') || '%}';
-    
+
     //include
     include = conf.include || null;
 
