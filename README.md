@@ -3,8 +3,14 @@ fis-preprocessor-widget-inline
 
 fispc 提供widget inline功能
 
-###配置
+###安装
+
+```bash
+$ npm install -g fis-preprocessor-widget-inline
 ```
+
+###配置
+```javascript
 fis.config.merge({
     namespace: 'demo',
     modules: {
