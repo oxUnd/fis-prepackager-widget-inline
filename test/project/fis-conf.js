@@ -2,7 +2,7 @@ fis.config.merge({
     namespace: 'demo',
     modules: {
         preprocessor: {
-            tpl: 'widget-inline, extlang'
+            tpl: 'inline,widget-inline, extlang'
         }
     },
     settings: {
