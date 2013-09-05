@@ -20,7 +20,7 @@ function smarty_block_widget_inline($params, $content, Smarty_Internal_Template 
     if(!$repeat){//block 定义结束
         FISBlockFisWidget::pop($template->tpl_vars);
         return $content;
-    }else{//block 定义开始
+    } else {//block 定义开始
         FISBlockFisWidget::push($params, $template->tpl_vars);
     }
 }
