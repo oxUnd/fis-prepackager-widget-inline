@@ -19,7 +19,7 @@ function pregQuote (str, delimiter) {
 function _replace(id, properties) {
     id = id || '';
     properties = properties || '';
-    var p, path;
+    var p, path = id;
     if ((p = id.indexOf(':')) !== -1) {
         path = '/' + id.substr(p + 1);
     }
@@ -36,9 +36,13 @@ function replaceWidget(content) {
         , widget_re = new RegExp(escape_ld + 'widget(?:((?=\\s)[\\s\\S]*?["\'\\s\\w])'+escape_rd+'|'+escape_rd+')', 'ig');
     return content.replace(widget_re, function(m, properties) {
         if (properties) {
-            m = properties.replace(/^([\s\S]*?)name\s*=\s*['"]([\s\S]*?)["']([\s\S]*?)$/i, function($0, $1, $2, $3) {
+            var ret = properties.replace(/^([\s\S]*?)\bname\s*=\s*((?=['"])['"](?:[^\s]+?)["']|[^\s]+?(?:\s|$))([\s\S]*?)$/i, function($0, $1, $2, $3) {
+                if (!$2) {
+                    return m;
+                }
+                var info = fis.util.stringQuote($2.trim());
                 if (inline_re.test(properties)) {
-                    return _replace($2, ($1 + $3).replace(inline_re, '').trim());
+                    return _replace(info.rest, ($1 + $3).replace(inline_re, '').trim());
                 } else if (include && Object.prototype.toString.apply(include) == '[object RegExp]') {
                     if (include.test($2)) {
                         return  _replace($2, $1 + $3);
@@ -46,6 +50,9 @@ function replaceWidget(content) {
                 }
                 return m;
             });
+            if (ret != properties) {
+                m = ret;
+            }
 
         }
         return m;
