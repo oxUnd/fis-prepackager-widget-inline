@@ -22,7 +22,7 @@ fis.config.merge({
         preprocessor: {
             'widget-inline':  {
                 include: /.*/i,
-                exclude: '(widget_a|widget_b|widget_c|widget_d)'
+                exclude: /(widget_a|widget_b|widget_c|widget_d)/
             }
         }
     }
