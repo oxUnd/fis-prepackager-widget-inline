@@ -1,6 +1,6 @@
 {
   "name": "fis-preprocessor-widget-inline",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "widget inline",
   "main": "index.js",
   "directories": {
