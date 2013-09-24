@@ -9,7 +9,7 @@
 
 'use strict';
 
-var ld, rd, include;
+var ld, rd, include, exclude;
 
 function pregQuote (str, delimiter) {
     // http://kevin.vanzonneveld.net
@@ -21,12 +21,25 @@ function _replace(id, properties) {
     properties = properties || '';
     var p, path = id;
     if ((p = id.indexOf(':')) !== -1) {
+        var namespace = id.substr(0, p);
+        //如果不是当前模块下的widget，滤过
+        if (namespace != fis.config.get('namespace')) {
+            return false;
+        }
         path = '/' + id.substr(p + 1);
     }
     return ld + 'widget_inline ' + properties + rd          /*start*/
             + '<!--inline[' + path + ']-->'                   /*内嵌语句*/
             + ld + 'require name="' + id + '"' + rd
             + ld + '/widget_inline' + rd;                   /*end*/
+}
+
+function hit(id, include, exclude) {
+    var toString = Object.prototype.toString;
+    return
+        !(exclude && toString(exclude) == '[object RegExp]' && exclude.test(id))
+        &&
+        (include && toString(include) == '[object RegExp]' && include.test(id));
 }
 
 function replaceWidget(content) {
@@ -45,12 +58,14 @@ function replaceWidget(content) {
                 return $0;
             });
             if (info && info.rest) {
+                var res;
                 if (inline_re.test(properties)) {
-                    return _replace(info.rest, properties.replace(inline_re, '').trim());
-                } else if (include && Object.prototype.toString.apply(include) == '[object RegExp]') {
-                    if (include.test(info.rest)) {
-                        return  _replace(info.rest, properties);
-                    }
+                    res = _replace(info.rest, properties.replace(inline_re, '').trim());
+                } else if (hit(info.rest, include, exclude)) {
+                    res = _replace(info.rest, properties);
+                }
+                if (res) {
+                    m = res;
                 }
             }
         }
@@ -68,6 +83,8 @@ module.exports = function(content, file, conf) {
 
     //include
     include = conf.include || null;
+
+    exclude = conf.exclude || null;
 
     return replaceWidget(content);
 };
