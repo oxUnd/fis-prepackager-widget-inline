@@ -37,9 +37,9 @@ function _replace(id, properties) {
 function hit(id, include, exclude) {
     var toString = Object.prototype.toString;
     return
-        !(exclude && toString(exclude) == '[object RegExp]' && exclude.test(id))
+        !(exclude && toString.apply(exclude) == '[object RegExp]' && exclude.test(id))
         &&
-        (include && toString(include) == '[object RegExp]' && include.test(id));
+        (include && toString.apply(include) == '[object RegExp]' && include.test(id));
 }
 
 function replaceWidget(content) {
