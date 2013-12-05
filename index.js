@@ -28,10 +28,16 @@ function _replace(id, properties) {
         }
         path = '/' + id.substr(p + 1);
     }
-    return ld + 'widget_inline ' + properties + rd          /*start*/
-            + '<!--inline[' + path + ']-->'                   /*内嵌语句*/
+
+    var file = fis.file(fis.project.getProjectPath() + '/' + path);
+    if (file.exists() && file.isText()) {
+         return ld + 'widget_inline ' + properties + rd          /*start*/
+            + file.getContent()                             //content 
             + ld + 'require name="' + id + '"' + rd
             + ld + '/widget_inline' + rd;                   /*end*/
+
+    }
+    return false;
 }
 
 function hit(id, include, exclude) {
@@ -43,7 +49,7 @@ function replaceWidget(content) {
     var inline_re = /\s+inline(?:\s+|$)/i
         , escape_ld = pregQuote(ld)
         , escape_rd = pregQuote(rd)
-        , widget_re = new RegExp(escape_ld + 'widget(?:((?=\\s)[\\s\\S]*?["\'\\s\\w])'+escape_rd+'|'+escape_rd+')', 'ig');
+        , widget_re = new RegExp(escape_ld + 'widget(?:((?=\\s)[\\s\\S]*?["\'\\s\\w\\]`])'+escape_rd+'|'+escape_rd+')', 'ig');
     return content.replace(widget_re, function(m, properties) {
         if (properties) {
             var info;
