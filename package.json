@@ -1,5 +1,5 @@
 {
-  "name": "fis-preprocessor-widget-inline",
+  "name": "fis-postprocessor-widget-inline",
   "version": "0.0.6",
   "description": "widget inline",
   "main": "index.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xiangshouding/fis-preprocessor-widget-inline.git"
+    "url": "https://github.com/xiangshouding/fis-postprocessor-widget-inline.git"
   },
   "keywords": [
     "fis",
@@ -22,6 +22,6 @@
   "author": "xiangshouding <xiangshouding@baidu.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xiangshouding/fis-preprocessor-widget-inline/issues"
+    "url": "https://github.com/xiangshouding/fis-postprocessor-widget-inline/issues"
   }
 }
