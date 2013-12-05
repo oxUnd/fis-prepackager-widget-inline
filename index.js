@@ -3,15 +3,13 @@
  * DESC:
  * {%widget name="demo:a.tpl" inline%}
  *  =>
- * {%widget_inline%}<!--inline [/a.tpl]-->{%/widget_inline%}
+ * {%widget_inline%}content of  a.tpl{%/widget_inline%}
  */
 
 
 'use strict';
 
 var ld, rd, include, exclude, config;
-
-
 
 var exports = module.exports = function(content, file, conf) {
     if (file.rExt !== '.tpl') {
