@@ -9,7 +9,12 @@
 
 'use strict';
 
-var ld, rd, include, exclude, ids, parsed = {};
+var ld
+    , rd
+    , include
+    , exclude
+    , ids
+    , parsed = {};
 
 var exports = module.exports = function(ret, conf, settings, opt) {
 
