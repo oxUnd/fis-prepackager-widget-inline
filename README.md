@@ -1,4 +1,4 @@
-fis-postprocessor-widget-inline
+fis-prepackager-widget-inline
 ==============================
 
 fispc 提供widget inline功能
@@ -6,7 +6,7 @@ fispc 提供widget inline功能
 ###安装
 
 ```bash
-$ npm install -g fis-postprocessor-widget-inline
+$ npm install -g fis-prepackager-widget-inline
 ```
 
 ###配置
@@ -14,12 +14,10 @@ $ npm install -g fis-postprocessor-widget-inline
 fis.config.merge({
     namespace: 'demo',
     modules: {
-        postprocessor: {
-            tpl: 'widget-inline, extlang'
-        }
+        prepackager: 'widget-inline'
     },
     settings: {
-        postprocessor: {
+        prepackager: {
             'widget-inline':  {
                 include: /.*/i,
                 exclude: /(widget_a|widget_b|widget_c|widget_d)/

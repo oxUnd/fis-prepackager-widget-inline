@@ -3,34 +3,32 @@
  * DESC:
  * {%widget name="demo:a.tpl" inline%}
  *  =>
- * {%widget_inline%}content of  a.tpl{%/widget_inline%}
+ * {%widget_inline%}<!--inline [/a.tpl]-->{%/widget_inline%}
  */
 
 
 'use strict';
 
-var ld, rd, include, exclude, config;
+var ld, rd, include, exclude, ids, parsed = {};
 
-var exports = module.exports = function(content, file, conf) {
-    if (file.rExt !== '.tpl') {
-        return content;
-    }
+var exports = module.exports = function(ret, conf, settings, opt) {
 
-    ld = conf.left_delimiter || fis.config.get('settings.smarty.left_delimiter') || '{%';
-    rd = conf.right_delimiter || fis.config.get('settings.smarty.right_delimiter') || '%}';
-
+    ld = settings.left_delimiter || fis.config.get('settings.smarty.left_delimiter') || '{%';
+    rd = settings.right_delimiter || fis.config.get('settings.smarty.right_delimiter') || '%}';
+    
     //include 读取preprocessor的配置是为了向下兼容
-    include = conf.include || fis.config.get('settings.preprocessor.widget-inline.include') || null;
+    include = settings.include || fis.config.get('settings.preprocessor.widget-inline.include') || null;
     //exclude 读取preprocessor的配置是为了向下兼容
-    exclude = conf.exclude || fis.config.get('settings.preprocessor.widget-inline.exclude') || null;
+    exclude = settings.exclude || fis.config.get('settings.preprocessor.widget-inline.exclude') || null;
+    
+    ids = ret.ids || {};
 
-    config = conf;
+    fis.util.map(ids, function (src, file) {
+        if (file.rExt == '.tpl' && !parsed[file.realpath]) {
+            embedded(file);
+        }
+    });
 
-    var content = embedded(content, file);
-
-    embeddedUnlock(file);
-
-    return content;
 };
 
 
@@ -46,11 +44,10 @@ function inline(id, properties) {
         if (namespace != fis.config.get('namespace')) {
             return false;
         }
-        path = '/' + id.substr(p + 1);
     }
 
     return ld + 'widget_inline ' + properties + rd          /*start*/
-        + map.embed.ld + path + map.embed.rd
+        + map.embed.ld + id + map.embed.rd
         + ld + 'require name="' + id + '"' + rd
         + ld + '/widget_inline' + rd;                   /*end*/
 
@@ -61,16 +58,15 @@ function hit(id, include, exclude) {
     return !(exclude && toString.apply(exclude) == '[object RegExp]' && exclude.test(id)) && (include && toString.apply(include) == '[object RegExp]' && include.test(id));
 }
 
-function embedded(content, file) {
+function preparser(file) {
     var inline_re = /\s+inline(?:\s+|$)/i;
     var escape_ld = fis.util.escapeReg(ld);
     var escape_rd = fis.util.escapeReg(rd);
     var widget_re = new RegExp(escape_ld + 'widget(?:((?=\\s)[\\s\\S]*?["\'\\s\\w\\]`])'+escape_rd+'|'+escape_rd+')', 'ig');
-    
+    var content = file.getContent();
     content = content.replace(widget_re, function(m, properties) {
         if (properties) {
             var info;
-            
             properties = properties.replace(/\sname\s*=\s*('(?:[^\\'\n\r\f]|\\[\s\S])*'|"(?:[^\\"\r\n\f]|\\[\s\S])*"|\S+)/i, function($0, $1) {
                 if ($1) {
                     info = fis.util.stringQuote($1);
@@ -95,7 +91,7 @@ function embedded(content, file) {
         return m;
     });
 
-    return standard(content, file);
+    return content;
 }
 
 var embeddedMap = {};
@@ -130,17 +126,9 @@ function embeddedUnlock(file){
 }
 
 
-function addDeps(a, b){
-    if(a && a.cache && b){
-        if(b.cache){
-            a.cache.mergeDeps(b.cache);
-        }
-        a.cache.addDeps(b.realpath || b);
-    }
-}
-
-function standard(content, file) {
+function embedded(file) {
     var path = file.realpath;
+    var content = preparser(file);
     if(typeof content === 'string'){
         fis.log.debug('widget_inline start');
         //expand language ability
@@ -149,19 +137,12 @@ function standard(content, file) {
             try {
                 switch(type){
                     case 'embed':
-                        info = fis.uri(value, file.dirname);
-                        var f;
-
-                        if(info.file){
-                            f = info.file;
-                        } else if(fis.util.isAbsolute(info.rest)){
-                            f = fis.file(info.rest);
-                        }
+                        var f = ids[value];
                         if(f && f.isFile()){
                             if(embeddedCheck(file, f)){
-                                var ret = exports(f.getContent(), f, config);
-                                //@TODO use cache
-                                //addDeps(file, f);
+                                embedded(f);
+                                embeddedUnlock(f);
+                                ret = f.getContent();
                             }
                         } else {
                             fis.log.error('unable to embed non-existent file [' + value + ']');
@@ -175,11 +156,11 @@ function standard(content, file) {
                 e.message = e.message + ' in [' + file.subpath + ']';
                 throw  e;
             }
-            
+
             return ret;
         });
-
         fis.log.debug('widget_inline end');
     }
-    return content;
+    parsed[file.realpath] = true;
+    file.setContent(content);
 }
