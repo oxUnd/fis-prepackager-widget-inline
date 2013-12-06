@@ -1,6 +1,6 @@
 {
-  "name": "fis-postprocessor-widget-inline",
-  "version": "0.0.7",
+  "name": "fis-prepackager-widget-inline",
+  "version": "0.0.8",
   "description": "widget inline",
   "main": "index.js",
   "directories": {
@@ -11,17 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xiangshouding/fis-postprocessor-widget-inline.git"
+    "url": "https://github.com/xiangshouding/fis-prepackager-widget-inline.git"
   },
   "keywords": [
     "fis",
-    "preprocessor",
-    "smarty",
+    "prepackager",
     "widget"
   ],
   "author": "xiangshouding <xiangshouding@baidu.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xiangshouding/fis-postprocessor-widget-inline/issues"
+    "url": "https://github.com/xiangshouding/fis-prepackager-widget-inline/issues"
   }
 }
