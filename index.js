@@ -14,10 +14,10 @@ var ld
     , include
     , exclude
     , ids
-    , parsed = {};
+    , parsed;
 
 var exports = module.exports = function(ret, conf, settings, opt) {
-
+    
     ld = settings.left_delimiter || fis.config.get('settings.smarty.left_delimiter') || '{%';
     rd = settings.right_delimiter || fis.config.get('settings.smarty.right_delimiter') || '%}';
     
@@ -27,16 +27,27 @@ var exports = module.exports = function(ret, conf, settings, opt) {
     exclude = settings.exclude || fis.config.get('settings.preprocessor.widget-inline.exclude') || null;
     
     ids = ret.ids || {};
-
+    parsed = {};
     fis.util.map(ids, function (src, file) {
-        if (file.rExt == '.tpl' && !parsed[file.realpath]) {
+        if (file.rExt == '.tpl') {
+
+            var revertObj = {};
+            //@TODO, ugly!!!
+            //prepackager 缓存一定是存在的
+            if(file.cache.revert(revertObj)) {
+                file.requires = revertObj.info.requires;
+                file.extras = revertObj.info.extras;
+                //存储缓存时获取原缓存附加信息，以防止升级出现兼容问题
+                revertObj = revertObj.info;
+            }
+
             embedded(file);
+
+            file.cache.save(file.getContent(), revertObj);
         }
     });
 
 };
-
-
 
 var map = fis.compile.lang;
 
@@ -130,42 +141,55 @@ function embeddedUnlock(file){
     delete embeddedMap[file.realpath];
 }
 
+function addDeps(a, b){
+    if(a && a.cache && b){
+        if(b.cache){
+            a.cache.mergeDeps(b.cache);
+        }
+        a.cache.addDeps(b.realpath || b);
+    }
+}
 
 function embedded(file) {
-    var path = file.realpath;
-    var content = preparser(file);
-    if(typeof content === 'string'){
-        fis.log.debug('widget_inline start');
-        //expand language ability
-        content = content.replace(map.reg, function(all, type, value){
-            var ret = '', info;
-            try {
-                switch(type){
-                    case 'embed':
-                        var f = ids[value];
-                        if(f && f.isFile()){
-                            if(embeddedCheck(file, f)){
-                                embedded(f);
-                                embeddedUnlock(f);
-                                ret = f.getContent();
+    if (parsed[file.realpath]) {
+        return true;
+    } else {
+        var path = file.realpath;
+        var content = preparser(file);
+        if(typeof content === 'string'){
+            fis.log.debug('widget_inline start');
+            //expand language ability
+            content = content.replace(map.reg, function(all, type, value){
+                var ret = '', info;
+                try {
+                    switch(type){
+                        case 'embed':
+                            var f = ids[value];
+                            if(f && f.isFile()){
+                                if(embeddedCheck(file, f)){
+                                    embedded(f);
+                                    addDeps(file, f); //添加依赖
+                                    embeddedUnlock(f);
+                                    ret = f.getContent();
+                                }
+                            } else {
+                                fis.log.error('unable to embed non-existent file [' + value + ']');
                             }
-                        } else {
-                            fis.log.error('unable to embed non-existent file [' + value + ']');
-                        }
-                        break;
-                    default :
-                        fis.log.error('unsupported fis language tag [' + type + ']');
+                            break;
+                        default :
+                            fis.log.error('unsupported fis language tag [' + type + ']');
+                    }
+                } catch (e) {
+                    embeddedMap = {};
+                    e.message = e.message + ' in [' + file.subpath + ']';
+                    throw  e;
                 }
-            } catch (e) {
-                embeddedMap = {};
-                e.message = e.message + ' in [' + file.subpath + ']';
-                throw  e;
-            }
-
-            return ret;
-        });
-        fis.log.debug('widget_inline end');
+                return ret;
+            });
+            fis.log.debug('widget_inline end');
+        }
+        file.setContent(content);
+        parsed[file.realpath] = true;
+        return true;
     }
-    parsed[file.realpath] = true;
-    file.setContent(content);
 }
