@@ -1,9 +1,11 @@
 fis-prepackager-widget-inline
 ==============================
 
-fispc 提供widget inline功能
+fis-plus 提供widget inline功能
 
 ###安装
+
+**fis-plus 已经内置**
 
 ```bash
 $ npm install -g fis-prepackager-widget-inline
